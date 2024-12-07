@@ -1,25 +1,46 @@
-import logo from './logo.svg';
-import './App.css';
+import Login from "./components/Login";
+import ListeNotes from "./components/ListeNotes";
+import UpdatePassword from "./components/updatePassword";
+import "./style.css";
+import { useEffect, useState } from "react";
+import { Route, Routes, useNavigate, useLocation } from "react-router-dom";
 
 function App() {
+  const [isConnected, SetIsConnected] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Check token on mount
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      SetIsConnected(true);
+    } else {
+      SetIsConnected(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isConnected) {
+      if (location.pathname === "/login") {
+        navigate("/login");
+      }
+    } else if (location.pathname !== "/change-password") {
+      navigate("/login");
+    }
+  }, [isConnected, navigate, location.pathname]);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Routes>
+      <Route
+        path="/ListeNotes"
+        element={<ListeNotes SetIsConnected={SetIsConnected} />}
+      />
+      <Route
+        path="/login"
+        element={<Login SetIsConnected={SetIsConnected} />}
+      />
+      <Route path="/change-password" element={<UpdatePassword />} />
+    </Routes>
   );
 }
-
 export default App;
